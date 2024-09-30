@@ -1,0 +1,7 @@
+---
+title: "p8105_hw2_yc4584"
+author: "Yingyu Cui"
+date: "2024-09-30"
+output: github_document
+---
+
