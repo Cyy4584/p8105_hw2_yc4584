@@ -147,3 +147,91 @@ total_cigarettes_gwynnda = trash_df_tidy |>
 print(total_cigarettes_gwynnda)
 ```
 Therefore, the total number of cigarette butts collected by Gwynnda in June of 2022 is 18120.
+
+
+# Problem 3: Great British Bake Off
+import and clean the data sets for bakes
+```{r import the data sets for bakes}
+bakes_df = 
+  read_csv("./data/bakes.csv", na = c("", "N/A")) |> 
+  janitor::clean_names()
+```
+import and clean the data sets for bakers
+```{r import the data sets for bakers}
+bakers_df = 
+  read_csv("./data/bakers.csv") |> 
+  janitor::clean_names() |> 
+  rename(baker = baker_name)
+  bakers_df$baker = str_extract(bakers_df$baker, "^[^ ]+")
+```
+import and clean the data sets for results
+```{r import the data sets for results}
+results_df = 
+  read_csv("./data/results.csv", skip = 2, na = c("", "NA")) |> 
+  janitor::clean_names()
+```
+check the missing values in the bakers_df
+```{r check the missing values1}
+missing_result1 = anti_join( bakers_df, results_df, by = "baker", "series")
+print(missing_result1)
+```
+
+check the missing values in the bakes_df
+```{r check the missing values2}
+missing_result2 = anti_join(bakes_df, results_df, by = "baker", "series")
+print(missing_result2)
+```
+
+We found that the baker "Jo" in sery 2 is lost in the results_df. Therefore, we need to add the baker "Jo" to the results_df or omit it when combining the data frames.
+
+combine and reorder the data frames
+```{r combine and reorder the data frames}
+full_df = 
+  left_join(results_df, bakes_df, by = c("baker", "series", "episode")) |>   left_join(bakers_df) |> 
+  select("baker", "baker_age", "baker_occupation", "hometown", "series", "episode", "signature_bake", everything())
+```
+export the new cvs.
+```{r export the new cvs}
+write_csv(full_df, "./data/full_df.csv")
+```
+
+Question1:
+Describe your data cleaning process, including any questions you have or choices you made. Briefly discuss the final dataset.
+
+For the data cleaning process, I used the read_csv function to read the data sets and set the NA and the janitor package to clean the column names. Besides, I rename the original baker_name column in the bakers_df into baker, which is for later combining. I also used the str_extract function to extract the first name of the bakers in the bakers_df. In the results_df, I skip the first 2 rows because it does not contain data but only some notes. After that, I used the anti_join function to check the missing values in the results_df. I found that the baker "Jo" in series 2 is lost. It is a question whether I need to add the baker "Jo" to the results_df or omit it when combining the data frames. Finally, I decided to use the left_join function to combine the data frames and the select function to reorder the columns so that the missing "Jo" could be omitted. For exporting csv, I used the write_csv function to export the new cvs.
+
+The final data contains 1136 rows and 10 columns and is organized by baker names and other personal information. The variables in the final data set are "baker", "baker_age", "baker_occupation", "hometown", "series", "episode", "signature_bake", "technical", "result" and "showstopper". In them, the "baker", "baker_occupation", "hometown",  "signature_bake", "result" and "showstopper" are character variables, the "baker_age", "series", "episode" and "technical" are numeric variables. The baker column is pretty important because I use it as the reference column to combine the three frames. The data set is pretty much clean except for the missing "Jo" in the results_df. In cleaning, I choose to omit it when combining. This data frame could be used to fully understand the performance and personal information of the bakers in the Great British Bake Off.
+
+Question2:
+Create a reader-friendly table showing the star baker or winner of each episode in Seasons 5 through 10.
+```{r create table}
+star_baker_winner = full_df |> 
+  filter(series >= 5 & series <= 10) |> 
+  filter(result %in% c("STAR BAKER", "WINNER")) |> 
+  group_by(series, episode) |> 
+  select(baker, series, episode, result)
+knitr::kable(star_baker_winner)
+```
+Comment on this table – were there any predictable overall winners? Any surprises?
+There are some predictable winners, like Nadiya in Season 6, Candice in Season 7. But there are also some surprises, like Nancy in Season 5, David in Season 10. Others in other seasons all had some powerful competitors, so it is hard to predict the overall winners.
+
+Question3:
+Import, clean, tidy, and organize the viewership data in viewers.csv. Show the first 10 rows of this dataset. 
+```{r import the viewership data}
+viewers_df = 
+  read_csv("./data/viewers.csv", na = c("", "NA")) |>
+  janitor::clean_names() |> 
+  slice(1:10)
+```
+What was the average viewership in Season 1? In Season 5?
+```{r average viewership 1}
+average_value_1 = 
+  mean(viewers_df$series_1, na.rm = TRUE)
+print(average_value_1)
+```
+```{r average viewership 5}
+average_value_5 = 
+  mean(viewers_df$series_5, na.rm = TRUE)
+print(average_value_5)
+```
+Therefore, the average viewership in Season 1 is 2.77 and the average viewership in Season 5 is 10.0393.
