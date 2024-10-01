@@ -84,5 +84,66 @@ print(num_A_train_ADA)
 Therefore, 17 stations that serve the A train are ADA compliant.
 
 
+# Problem 2: Mr. Trash Wheel
+```{r set up2}
+library(readxl)
+```
+Read and clean the data of Mr. Trash Wheel
+```{r read and clean the data of Mr. Trash Wheel}
+trash_df = 
+  read_excel("./data/202309 Trash Wheel Collection Data.xlsx", sheet = "Mr. Trash Wheel", range = "A2:N586") |> 
+  janitor::clean_names() |>
+  mutate(sports_balls = as.integer(round(sports_balls))) |> 
+  mutate(trash_wheel = "Mr. Trash Wheel") |> 
+  mutate(year = as.numeric(year))
+```
+Read and clean the data of Professor Trash Wheel
+```{r read and clean the data of Professor Trash Wheel}
+trash_df_professor = 
+  read_excel("./data/202309 Trash Wheel Collection Data.xlsx", sheet = "Professor Trash Wheel", range = "A2:M108") |> 
+  janitor::clean_names() |> 
+  mutate(trash_wheel = "Professor Trash Wheel") |> 
+  mutate(year = as.numeric(year))
+```
+Read and clean the data of Gwynnda
+```{r read and clean the data of Gwynnda}
+trash_df_gwynnda = 
+  read_excel("./data/202309 Trash Wheel Collection Data.xlsx", sheet = "Gwynnda Trash Wheel", range = "A2:L157") |> 
+  janitor::clean_names() |> 
+  mutate(trash_wheel = "Gwynnda Trash Wheel") |> 
+  mutate(year = as.numeric(year))
+```
+Combine the data frames 
+```{r combine the data frames}
+trash_df_tidy = bind_rows(trash_df, trash_df_professor, trash_df_gwynnda)
+```
+number of observations in the combined data frame
+```{r number of observations}
+total_observations <- nrow(trash_df_tidy)
+```
+Therefore, the total number of observations in the combined data frame is 845.
+examples of these variables
+```{r examples of these variables}
+str(trash_df_tidy)
+```
+The variables in the combined data frame are "year", "month", "trash_wheel", "total_debris", "total_tires", "total_bags", "total_balls", "total_cups", "total_bottles", "total_straws", "total_food_wrappers", "total_utensils", "total_cigarettes", "sports_balls". The "year" and "month" are numeric variables, the "trash_wheel" is a character variable, and the rest are integer variables.
 
+Question1:what was the total weight of trash collected by Professor Trash Wheel? 
+```{r total weight of trash collected by Professor Trash Wheel}
+total_weight_professor = trash_df_tidy |> 
+  filter(trash_wheel == "Professor Trash Wheel") |> 
+  summarize(total_weight_professor = sum(weight_tons)) |> 
+  pull(total_weight_professor)
+print(total_weight_professor)
+```
+Therefore, the total weight of trash collected by Professor Trash Wheel is 216.26 tons.
 
+Question2:  What was the total number of cigarette butts collected by Gwynnda in June of 2022?
+```{r total number of cigarette butts collected by Gwynnda in June of 2022}
+total_cigarettes_gwynnda = trash_df_tidy |> 
+  filter(trash_wheel == "Gwynnda Trash Wheel" & month == "June" & year == 2022) |> 
+  summarize(total_cigarettes_gwynnda = sum(cigarette_butts)) |> 
+  pull(total_cigarettes_gwynnda)
+print(total_cigarettes_gwynnda)
+```
+Therefore, the total number of cigarette butts collected by Gwynnda in June of 2022 is 18120.
