@@ -91,7 +91,7 @@ library(readxl)
 Read and clean the data of Mr. Trash Wheel
 ```{r read and clean the data of Mr. Trash Wheel}
 trash_df = 
-  read_excel("./data/202309 Trash Wheel Collection Data.xlsx", sheet = "Mr. Trash Wheel", range = "A2:N586") |> 
+  read_excel("./data/202409 Trash Wheel Collection Data.xlsx", sheet = "Mr. Trash Wheel", range = "A2:N653") |> 
   janitor::clean_names() |>
   mutate(sports_balls = as.integer(round(sports_balls))) |> 
   mutate(trash_wheel = "Mr. Trash Wheel") |> 
@@ -100,7 +100,7 @@ trash_df =
 Read and clean the data of Professor Trash Wheel
 ```{r read and clean the data of Professor Trash Wheel}
 trash_df_professor = 
-  read_excel("./data/202309 Trash Wheel Collection Data.xlsx", sheet = "Professor Trash Wheel", range = "A2:M108") |> 
+  read_excel("./data/202409 Trash Wheel Collection Data.xlsx", sheet = "Professor Trash Wheel", range = "A2:M120") |> 
   janitor::clean_names() |> 
   mutate(trash_wheel = "Professor Trash Wheel") |> 
   mutate(year = as.numeric(year))
@@ -108,7 +108,7 @@ trash_df_professor =
 Read and clean the data of Gwynnda
 ```{r read and clean the data of Gwynnda}
 trash_df_gwynnda = 
-  read_excel("./data/202309 Trash Wheel Collection Data.xlsx", sheet = "Gwynnda Trash Wheel", range = "A2:L157") |> 
+  read_excel("./data/202409 Trash Wheel Collection Data.xlsx", sheet = "Gwynnda Trash Wheel", range = "A2:L265") |> 
   janitor::clean_names() |> 
   mutate(trash_wheel = "Gwynnda Trash Wheel") |> 
   mutate(year = as.numeric(year))
@@ -121,12 +121,12 @@ number of observations in the combined data frame
 ```{r number of observations}
 total_observations <- nrow(trash_df_tidy)
 ```
-Therefore, the total number of observations in the combined data frame is 845.
+Therefore, the total number of observations in the combined data frame is 1032.
 examples of these variables
 ```{r examples of these variables}
 str(trash_df_tidy)
 ```
-The variables in the combined data frame are "year", "month", "trash_wheel", "total_debris", "total_tires", "total_bags", "total_balls", "total_cups", "total_bottles", "total_straws", "total_food_wrappers", "total_utensils", "total_cigarettes", "sports_balls". The "year" and "month" are numeric variables, the "trash_wheel" is a character variable, and the rest are integer variables.
+The variables in the combined data frame are "dumpster", "year", "month", "data", "weight_tons", "volume_cubic_yards", "plastic_bottles", "polystyrene", "cigarette_butts", "glass_bottles", "plastic_bags", "wrappers", "sports_balls", "homes_powered" and "trash_wheel". The "month" and "trash_wheel" are character variables and the rest are numeric variables except date.
 
 Question1:what was the total weight of trash collected by Professor Trash Wheel? 
 ```{r total weight of trash collected by Professor Trash Wheel}
@@ -136,7 +136,7 @@ total_weight_professor = trash_df_tidy |>
   pull(total_weight_professor)
 print(total_weight_professor)
 ```
-Therefore, the total weight of trash collected by Professor Trash Wheel is 216.26 tons.
+Therefore, the total weight of trash collected by Professor Trash Wheel is 246.74 tons.
 
 Question2:  What was the total number of cigarette butts collected by Gwynnda in June of 2022?
 ```{r total number of cigarette butts collected by Gwynnda in June of 2022}
