@@ -5,3 +5,84 @@ date: "2024-09-30"
 output: github_document
 ---
 
+```{r set up}
+library(tidyverse)
+```
+
+
+# Problem 1: NYC Transit Data
+
+Read and clean the data
+```{r read and clean the data}
+subway_df = 
+  read_csv("./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv", na = "") |> 
+  janitor::clean_names() |> 
+  select(line:entry, vending, ada) |>
+  mutate(entry = case_match(entry, 
+                            "YES" ~ TRUE,
+                            "NO" ~ FALSE))
+```
+For this data set, it contains the variables "line", "station_name",  "routes", "station_latitude", "station_longitude", "entrance_type", "entry", "vending" and "ada" columns. The "line", "station_name", "route1-7", "entrance_type" and "vending" are character variables, the "station_latitude", "station_longitude", "route8-11" are numeric variables, and the "entry" and "ada" are logical variables.
+For data cleaning, I used the janitor package to clean the column names and the select function to select the columns I need. I also used the case_match function to convert the "entry" column to logical variables.
+The dimension of the cleaned data set is 1868 rows and 19 columns.
+Except the columns of routes belonging to different kinds of variables, I think the data set is pretty much clean.
+
+Question1: 
+```{r distinct stations}
+distinct_stations = subway_df |> 
+  distinct(line, station_name)
+num_distinct_stations = nrow(distinct_stations)
+print(num_distinct_stations)
+```
+There are 465 distinct stations in the data set.
+
+Question2:
+```{r ADA compliance}
+num_ada_compliance = subway_df |> 
+  filter(ada == "TRUE") |> 
+  nrow()
+print(num_ada_compliance)
+```
+Therefore, 468 stations are ADA compliant.
+
+Question3:
+```{r vending}
+num_without_vending = subway_df |> 
+  filter(vending == "NO" & entry == "TRUE") |> 
+  nrow()
+print(num_without_vending)
+```
+Therefore, the proportion is 69/1867 = 0.037.
+
+Reformat data so that route number and route name are distinct variables.
+```{r reformat data}
+subway_df_reformat = subway_df |> 
+  mutate(across(starts_with("route"), as.character)) |> 
+  pivot_longer(cols = starts_with("route"),
+               names_to = "route_number", 
+               values_to = "route_name",
+               values_drop_na = TRUE)
+```
+How many serve the A train?
+```{r A train}
+num_A_train = subway_df_reformat |> 
+  filter(route_name == "A") |> 
+  distinct(line, station_name) |> 
+  nrow()
+print(num_A_train)
+```
+Therefore,60 distinct stations serve the A train.
+
+Of the stations that serve the A train, how many are ADA compliant?
+```{r A train ADA}
+num_A_train_ADA = subway_df_reformat |> 
+  filter(route_name == "A" & ada == "TRUE") |> 
+  distinct(line, station_name) |> 
+  nrow()
+print(num_A_train_ADA)
+```
+Therefore, 17 stations that serve the A train are ADA compliant.
+
+
+
+
