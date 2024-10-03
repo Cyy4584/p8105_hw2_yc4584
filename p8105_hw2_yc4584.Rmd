@@ -24,7 +24,7 @@ subway_df =
 ```
 For this data set, it contains the variables "line", "station_name",  "routes", "station_latitude", "station_longitude", "entrance_type", "entry", "vending" and "ada" columns. The "line", "station_name", "route1-7", "entrance_type" and "vending" are character variables, the "station_latitude", "station_longitude", "route8-11" are numeric variables, and the "entry" and "ada" are logical variables.
 For data cleaning, I used the janitor package to clean the column names and the select function to select the columns I need. I also used the case_match function to convert the "entry" column to logical variables.
-The dimension of the cleaned data set is 1868 rows and 19 columns.
+The dimension of the cleaned data set is 1868 rows and 32 columns.
 Except the columns of routes belonging to different kinds of variables, I think the data set is pretty much clean.
 
 Question1: 
@@ -40,19 +40,26 @@ Question2:
 ```{r ADA compliance}
 num_ada_compliance = subway_df |> 
   filter(ada == "TRUE") |> 
+  distinct(line, station_name) |> 
   nrow()
 print(num_ada_compliance)
 ```
-Therefore, 468 stations are ADA compliant.
+Therefore, 84 stations are ADA compliant.
 
 Question3:
 ```{r vending}
-num_without_vending = subway_df |> 
+num_without_vending_with_entry = subway_df |> 
   filter(vending == "NO" & entry == "TRUE") |> 
   nrow()
+print(num_without_vending_with_entry)
+
+num_without_vending = subway_df |> 
+  filter(vending == "NO") |> 
+  nrow()
 print(num_without_vending)
+summarise(subway_df, num_without_vending_with_entry/num_without_vending)
 ```
-Therefore, the proportion is 69/1867 = 0.037.
+Therefore, the proportion is 69/183 = 0.3770492
 
 Reformat data so that route number and route name are distinct variables.
 ```{r reformat data}
@@ -220,8 +227,8 @@ Import, clean, tidy, and organize the viewership data in viewers.csv. Show the f
 ```{r import the viewership data}
 viewers_df = 
   read_csv("./data/viewers.csv", na = c("", "NA")) |>
-  janitor::clean_names() |> 
-  slice(1:10)
+  janitor::clean_names()
+  head(viewers_df, 10)
 ```
 What was the average viewership in Season 1? In Season 5?
 ```{r average viewership 1}
